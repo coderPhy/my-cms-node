@@ -43,7 +43,7 @@ class GoodsServive {
     }
   }
   async totalCount() {
-    const statement = `SELECT count(*) totalCount FROM PRODUCT LiMIT 0,10000`;
+    const statement = `SELECT count(*) totalCount FROM product LiMIT 0,10000`;
     const [result] = await connection.execute(statement);
     return result[0].totalCount;
   }
