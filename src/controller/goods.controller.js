@@ -3,37 +3,41 @@ const errorTypes = require("../constants/error-types");
 
 class GoodsController {
   async list(ctx, next) {
-    const { offset, size, name, address, status, createAt } = ctx.request.body;
-    if (name || address || status || createAt) {
-      const list = await goodsServive.list(offset, size, {
-        name,
-        address,
-        status,
-        createAt,
-      });
-      const totalCount = list.length;
-      ctx.body = {
-        code: 0,
-        data: {
-          list,
-          totalCount,
-        },
-      };
-    } else {
-      // 不加筛选条件的查询
-      const list = await goodsServive.list(offset, size);
-      if (!list) {
-        return ctx.app.emit("error", new Error(errorTypes.NO_OF_FIND), ctx);
+    try {
+      const { offset, size, name, address, status, createAt } =
+        ctx.request.body;
+      if (name || address || status || createAt) {
+        const list = await goodsServive.list(offset, size, {
+          name,
+          address,
+          status,
+          createAt,
+        });
+        const totalCount = list.length;
+        ctx.body = {
+          code: 0,
+          data: {
+            list,
+            totalCount,
+          },
+        };
+      } else {
+        // 不加筛选条件的查询
+        const list = await goodsServive.list(offset, size);
+        if (!list) {
+          return ctx.app.emit("error", new Error(errorTypes.NO_OF_FIND), ctx);
+        }
+        const totalCount = await goodsServive.totalCount();
+        ctx.body = {
+          code: 0,
+          data: {
+            list,
+            totalCount,
+          },
+        };
       }
-      const totalCount = await goodsServive.totalCount();
-      // let totalCount = list.length ? list.length : 0;
-      ctx.body = {
-        code: 0,
-        data: {
-          list,
-          totalCount,
-        },
-      };
+    } catch (error) {
+      console.log(error);
     }
   }
   async getCategoryCount(ctx, next) {
